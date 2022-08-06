@@ -8,7 +8,7 @@ interface AdditionalConcurencyCondition {
 
 export class TasksExecutor {
   private tasksCompleted = 0;
-  private readonly tasksLength;
+  private readonly tasksLength: number;
   private concurrencyCurrent = 0;
   private concurrencyMax!: number;
   private myEmmiter = new EventEmitter();
@@ -22,7 +22,7 @@ export class TasksExecutor {
       this.concurrencyMax = concurrencyMax;
       const currentConcurency = Math.min(this.tasks.length - 1, concurrencyMax); // In case the number of tasks is less than the maximum number of threads.
 
-      this.myEmmiter.on('finishTask', () => {
+      this.myEmmiter.on('taskCompleted', () => {
         this.tasksCompleted++;
         this.concurrencyCurrent--;
         if (this.tasksLength !== this.tasksCompleted) {
@@ -63,7 +63,7 @@ export class TasksExecutor {
     console.log('[EXE] TaskCount: ' + this.tasksCompleted + ' in ' + this.tasksLength);
     console.log('\x1b[31m', '[TASK] STARTING: ' + currentTask, '\x1b[0m');
     await this.doTask(currentTask);
-    this.myEmmiter.emit('finishTask');
+    this.myEmmiter.emit('taskCompleted');
   }
 
   private doTask(taskName: string): Promise<boolean> {
